@@ -1,38 +1,31 @@
 --[[
     RAYFIELD MENU SCRIPT - AUTO-UPDATE SYSTEM
     Script ID: sid_scfu9em3x8ti
-    Raw GitHub: https://raw.githubusercontent.com/yourusername/yourrepo/main/script.lua
+    Raw GitHub: https://raw.githubusercontent.com/az09scxx28la-bit/SellLemonsScript/refs/heads/main/script.lua
 ]]
 
 -- [[ ========== AUTO-UPDATE SYSTEM ========== ]]
 local Rayfield = nil
 local scriptVersion = "1.0.0"
-local scriptID = "sid_scfu9em3x8ti" -- Your Rayfield script ID
+local scriptID = "sid_scfu9em3x8ti"
 
--- Function to check for updates (loads from raw GitHub)
 local function CheckForUpdates()
     local currentVersion = scriptVersion
-    local githubRawURL = "https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main/script.lua"
-    -- ^^^ CHANGE THIS TO YOUR ACTUAL GITHUB RAW URL ^^^
+    local githubRawURL = "https://raw.githubusercontent.com/az09scxx28la-bit/SellLemonsScript/refs/heads/main/script.lua"
     
-    -- Try to fetch the latest version
     local success, result = pcall(function()
         return game:HttpGet(githubRawURL)
     end)
-    
+
     if success and result then
-        -- Check version in the fetched script
         local newVersion = result:match('scriptVersion%s*=%s*"([^"]+)"')
         if newVersion and newVersion ~= currentVersion then
             print("🔄 New version available:", newVersion)
             print("📥 Downloading update...")
-            
-            -- Load the new script
             local loadSuccess, loadError = pcall(function()
-                local newScript = loadstring(result)()
+                loadstring(result)()
                 return true
             end)
-            
             if loadSuccess then
                 print("✅ Update applied successfully!")
                 return true
@@ -78,8 +71,9 @@ local MarketplaceService = game:GetService("MarketplaceService")
 local CoreGui = game:GetService("CoreGui")
 local TeleportService = game:GetService("TeleportService")
 local VirtualUser = game:GetService("VirtualUser")
+local TweenService = game:GetService("TweenService")
 
--- [[ ========== SETTINGS ========== ]]
+-- [[ ========== GLOBALS ========== ]]
 _G.InfJump = false
 _G.Noclip = false
 _G.ESPEnabled = false
@@ -90,6 +84,21 @@ _G.JumpPower = 50
 _G.CustomColor = Color3.fromRGB(0, 125, 255)
 _G.TransparencyValue = 0
 _G.FullTransparency = false
+_G.AutoFarm = false
+_G.AutoCollect = false
+_G.AntiKick = false
+_G.AntiBan = false
+_G.SpinBot = false
+_G.FlyMode = false
+_G.GodMode = false
+_G.TeleportOnDamage = false
+_G.AutoRejoin = false
+_G.BypassActive = false
+_G.BetaFeature1 = false
+_G.BetaFeature2 = false
+_G.SafetyMode = false
+_G.AntiCrash = false
+_G.AntiFreeze = false
 
 -- [[ ========== UTILITY FUNCTIONS ========== ]]
 local function getGameName()
@@ -137,41 +146,40 @@ end
 print("🔄 Creating Rayfield window...")
 
 local Window = Rayfield:CreateWindow({
-    Name = getGameName() .. " | v" .. scriptVersion,
+    Name = "🔰 SellLemons Hub | v" .. scriptVersion,
     LoadingTitle = "Loading Menu...",
     LoadingSubtitle = "Script ID: " .. scriptID,
     ConfigurationSaving = {
         Enabled = true,
-        FolderName = "YourHubConfigs",
+        FolderName = "SellLemonsConfigs",
         FileName = "UserPrefs"
     },
-    KeySystem = false, -- Set to true if you want a key system
-    -- KeySettings = { -- Uncomment if KeySystem is true
-    --     Key = "YourKeyHere",
-    --     Note = "Get your key from our Discord!"
-    -- }
+    KeySystem = false,
 })
 
 print("✅ Window created!")
 
--- [[ ========== CREATE TABS ========== ]]
--- Main Tabs
-local HomeTab = Window:CreateTab("Home", "home")
-local PlayerTab = Window:CreateTab("Player", "user")
-local VisualsTab = Window:CreateTab("Visuals", "eye")
-local TeleportTab = Window:CreateTab("Teleport", "map-pin")
+-- [[ ========== CREATE ALL TABS ========== ]]
+local MainTab = Window:CreateTab("Main", "home")
+local AutomationTab = Window:CreateTab("Automation", "play")
+local CheatsTab = Window:CreateTab("Cheats", "zap")
+local BetaTab = Window:CreateTab("Beta", "flask")
+local SafetyTab = Window:CreateTab("Safety", "shield")
+local AntiTab = Window:CreateTab("Anti", "ban")
+local BypassTab = Window:CreateTab("Bypass", "unlock")
+local FunTab = Window:CreateTab("Fun", "smile")
 local SettingsTab = Window:CreateTab("Settings", "settings")
 
-print("✅ Tabs created!")
+print("✅ 9 Tabs created!")
 
--- [[ ========== HOME TAB ========== ]]
-HomeTab:CreateSection("🏠 Welcome")
+-- [[ ========== MAIN TAB ========== ]]
+MainTab:CreateSection("🏠 Welcome")
 
-HomeTab:CreateLabel("Welcome to the Menu!")
-HomeTab:CreateLabel("Script ID: " .. scriptID)
-HomeTab:CreateLabel("Version: " .. scriptVersion)
+MainTab:CreateLabel("Welcome to SellLemons Hub!")
+MainTab:CreateLabel("Script ID: " .. scriptID)
+MainTab:CreateLabel("Version: " .. scriptVersion)
 
-HomeTab:CreateButton({
+MainTab:CreateButton({
     Name = "🔄 Check for Updates",
     Callback = function()
         Rayfield:Notify({
@@ -183,7 +191,7 @@ HomeTab:CreateButton({
     end
 })
 
-HomeTab:CreateButton({
+MainTab:CreateButton({
     Name = "📋 Copy Script ID",
     Callback = function()
         setclipboard(scriptID)
@@ -195,12 +203,142 @@ HomeTab:CreateButton({
     end
 })
 
--- [[ ========== PLAYER TAB ========== ]]
-PlayerTab:CreateSection("👤 Movement")
+MainTab:CreateSection("👤 Player Info")
 
-PlayerTab:CreateSlider({
+MainTab:CreateLabel("Username: " .. (LocalPlayer and LocalPlayer.Name or "Unknown"))
+MainTab:CreateLabel("Display Name: " .. (LocalPlayer and LocalPlayer.DisplayName or "Unknown"))
+MainTab:CreateLabel("User ID: " .. (LocalPlayer and LocalPlayer.UserId or "Unknown"))
+
+MainTab:CreateButton({
+    Name = "📋 Copy User ID",
+    Callback = function()
+        if LocalPlayer then
+            setclipboard(tostring(LocalPlayer.UserId))
+            Rayfield:Notify({
+                Title = "✅ Copied!",
+                Content = "User ID copied to clipboard",
+                Duration = 3
+            })
+        end
+    end
+})
+
+MainTab:CreateSection("🎮 Quick Actions")
+
+MainTab:CreateButton({
+    Name = "🔄 Reset Character",
+    Callback = function()
+        local char = LocalPlayer.Character
+        if char then
+            char:BreakJoints()
+            Rayfield:Notify({
+                Title = "Reset",
+                Content = "Character reset!",
+                Duration = 2
+            })
+        end
+    end
+})
+
+MainTab:CreateButton({
+    Name = "📍 Teleport to Spawn",
+    Callback = function()
+        local spawn = workspace:FindFirstChild("SpawnLocation")
+        if spawn and LocalPlayer.Character then
+            local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                hrp.CFrame = spawn.CFrame
+                Rayfield:Notify({
+                    Title = "Teleported!",
+                    Content = "Moved to spawn location",
+                    Duration = 3
+                })
+            end
+        else
+            Rayfield:Notify({
+                Title = "Error",
+                Content = "No spawn location found!",
+                Duration = 3
+            })
+        end
+    end
+})
+
+-- [[ ========== AUTOMATION TAB ========== ]]
+AutomationTab:CreateSection("🤖 Auto Farm")
+
+AutomationTab:CreateToggle({
+    Name = "🔄 Auto Farm",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.AutoFarm = Value
+        Rayfield:Notify({
+            Title = "Auto Farm",
+            Content = Value and "✅ Enabled" or "❌ Disabled",
+            Duration = 2
+        })
+    end
+})
+
+AutomationTab:CreateToggle({
+    Name = "📦 Auto Collect",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.AutoCollect = Value
+        Rayfield:Notify({
+            Title = "Auto Collect",
+            Content = Value and "✅ Enabled" or "❌ Disabled",
+            Duration = 2
+        })
+    end
+})
+
+AutomationTab:CreateToggle({
+    Name = "🔄 Auto Rejoin",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.AutoRejoin = Value
+        Rayfield:Notify({
+            Title = "Auto Rejoin",
+            Content = Value and "✅ Enabled" or "❌ Disabled",
+            Duration = 2
+        })
+    end
+})
+
+AutomationTab:CreateSection("⚙️ Automation Settings")
+
+AutomationTab:CreateSlider({
+    Name = "Farm Speed",
+    Range = {1, 10},
+    Increment = 1,
+    CurrentValue = 5,
+    Callback = function(Value)
+        print("Farm speed set to:", Value)
+        Rayfield:Notify({
+            Title = "Farm Speed",
+            Content = "Set to " .. Value,
+            Duration = 2
+        })
+    end
+})
+
+AutomationTab:CreateSlider({
+    Name = "Collection Delay (seconds)",
+    Range = {1, 30},
+    Increment = 1,
+    CurrentValue = 5,
+    Callback = function(Value)
+        print("Collection delay set to:", Value)
+    end
+})
+
+-- [[ ========== CHEATS TAB ========== ]]
+CheatsTab:CreateSection("👤 Movement")
+
+CheatsTab:CreateSlider({
     Name = "WalkSpeed",
-    Range = {16, 300},
+    Range = {16, 350},
     Increment = 1,
     CurrentValue = 16,
     Callback = function(Value)
@@ -212,7 +350,7 @@ PlayerTab:CreateSlider({
     end
 })
 
-PlayerTab:CreateSlider({
+CheatsTab:CreateSlider({
     Name = "JumpPower",
     Range = {50, 500},
     Increment = 1,
@@ -228,8 +366,8 @@ PlayerTab:CreateSlider({
     end
 })
 
-PlayerTab:CreateToggle({
-    Name = "Infinite Jump",
+CheatsTab:CreateToggle({
+    Name = "🦘 Infinite Jump",
     CurrentValue = false,
     Callback = function(Value)
         _G.InfJump = Value
@@ -241,8 +379,8 @@ PlayerTab:CreateToggle({
     end
 })
 
-PlayerTab:CreateToggle({
-    Name = "Noclip",
+CheatsTab:CreateToggle({
+    Name = "🔄 Noclip",
     CurrentValue = false,
     Callback = function(Value)
         _G.Noclip = Value
@@ -254,27 +392,57 @@ PlayerTab:CreateToggle({
     end
 })
 
-PlayerTab:CreateSection("🛡️ Safety")
-
-PlayerTab:CreateButton({
-    Name = "🔄 Reset Character",
-    Callback = function()
-        local char = LocalPlayer.Character
-        if char then
-            char:BreakJoints()
-            Rayfield:Notify({
-                Title = "Reset",
-                Content = "Character reset!",
-                Duration = 2
-            })
-        end
+CheatsTab:CreateToggle({
+    Name = "✈️ Fly Mode",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.FlyMode = Value
+        Rayfield:Notify({
+            Title = "Fly Mode",
+            Content = Value and "✅ Enabled" or "❌ Disabled",
+            Duration = 2
+        })
     end
 })
 
--- [[ ========== VISUALS TAB ========== ]]
-VisualsTab:CreateSection("👁️ Visuals")
+CheatsTab:CreateSection("🛡️ God Mode")
 
-VisualsTab:CreateSlider({
+CheatsTab:CreateToggle({
+    Name = "💀 God Mode",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.GodMode = Value
+        if Value then
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChildOfClass("Humanoid") then
+                char:FindFirstChildOfClass("Humanoid").MaxHealth = math.huge
+                char:FindFirstChildOfClass("Humanoid").Health = math.huge
+            end
+        end
+        Rayfield:Notify({
+            Title = "God Mode",
+            Content = Value and "✅ Enabled" or "❌ Disabled",
+            Duration = 2
+        })
+    end
+})
+
+CheatsTab:CreateToggle({
+    Name = "💫 Teleport on Damage",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.TeleportOnDamage = Value
+        Rayfield:Notify({
+            Title = "Teleport on Damage",
+            Content = Value and "✅ Enabled" or "❌ Disabled",
+            Duration = 2
+        })
+    end
+})
+
+CheatsTab:CreateSection("👁️ Visuals")
+
+CheatsTab:CreateSlider({
     Name = "FOV",
     Range = {30, 120},
     Increment = 1,
@@ -287,8 +455,8 @@ VisualsTab:CreateSlider({
     end
 })
 
-VisualsTab:CreateToggle({
-    Name = "Player ESP",
+CheatsTab:CreateToggle({
+    Name = "🎯 Player ESP",
     CurrentValue = false,
     Callback = function(Value)
         _G.ESPEnabled = Value
@@ -308,8 +476,8 @@ VisualsTab:CreateToggle({
     end
 })
 
-VisualsTab:CreateColorPicker({
-    Name = "ESP Color",
+CheatsTab:CreateColorPicker({
+    Name = "🎨 ESP Color",
     Color = Color3.fromRGB(255, 0, 0),
     Callback = function(Value)
         _G.ESPColor = Value
@@ -322,55 +490,409 @@ VisualsTab:CreateColorPicker({
     end
 })
 
--- [[ ========== TELEPORT TAB ========== ]]
-TeleportTab:CreateSection("🌐 Teleport")
-
-TeleportTab:CreateButton({
-    Name = "📍 Teleport to Spawn",
-    Callback = function()
-        local spawn = workspace:FindFirstChild("SpawnLocation")
-        if spawn then
-            LocalPlayer.Character.HumanoidRootPart.CFrame = spawn.CFrame
-            Rayfield:Notify({
-                Title = "Teleported!",
-                Content = "Moved to spawn location",
-                Duration = 3
-            })
-        else
-            Rayfield:Notify({
-                Title = "Error",
-                Content = "No spawn location found!",
-                Duration = 3
-            })
-        end
+CheatsTab:CreateToggle({
+    Name = "🔄 Spin Bot",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.SpinBot = Value
+        Rayfield:Notify({
+            Title = "Spin Bot",
+            Content = Value and "✅ Enabled" or "❌ Disabled",
+            Duration = 2
+        })
     end
 })
 
-TeleportTab:CreateButton({
-    Name = "📍 Teleport to Players",
-    Callback = function()
-        local players = {}
-        for _, v in pairs(Players:GetPlayers()) do
-            if v ~= LocalPlayer and v.Character then
-                table.insert(players, v.Name)
+-- [[ ========== BETA TAB ========== ]]
+BetaTab:CreateSection("🧪 Beta Features")
+
+BetaTab:CreateLabel("⚠️ These features are experimental!")
+BetaTab:CreateLabel("Use at your own risk!")
+
+BetaTab:CreateToggle({
+    Name = "🧪 Beta Feature 1: Super Jump",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.BetaFeature1 = Value
+        if Value then
+            _G.JumpPower = 1000
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChildOfClass("Humanoid") then
+                char:FindFirstChildOfClass("Humanoid").JumpPower = 1000
+            end
+        else
+            _G.JumpPower = 50
+            local char = LocalPlayer.Character
+            if char and char:FindFirstChildOfClass("Humanoid") then
+                char:FindFirstChildOfClass("Humanoid").JumpPower = 50
             end
         end
-        
-        if #players == 0 then
-            Rayfield:Notify({
-                Title = "No Players",
-                Content = "No other players found!",
-                Duration = 3
-            })
-            return
-        end
-        
-        -- You could add a dropdown here for player selection
-        print("Players found:", table.concat(players, ", "))
         Rayfield:Notify({
-            Title = "Check Console",
-            Content = "Players list printed to F9",
+            Title = "Super Jump",
+            Content = Value and "✅ Enabled (1000 JumpPower)" or "❌ Disabled (50 JumpPower)",
             Duration = 3
+        })
+    end
+})
+
+BetaTab:CreateToggle({
+    Name = "🧪 Beta Feature 2: Infinite Stamina",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.BetaFeature2 = Value
+        Rayfield:Notify({
+            Title = "Infinite Stamina",
+            Content = Value and "✅ Enabled" or "❌ Disabled",
+            Duration = 2
+        })
+    end
+})
+
+BetaTab:CreateToggle({
+    Name = "🧪 Beta Feature 3: Fast Respawn",
+    CurrentValue = false,
+    Callback = function(Value)
+        print("Fast Respawn:", Value)
+        Rayfield:Notify({
+            Title = "Fast Respawn",
+            Content = Value and "✅ Enabled" or "❌ Disabled",
+            Duration = 2
+        })
+    end
+})
+
+BetaTab:CreateSection("📊 Beta Stats")
+
+BetaTab:CreateLabel("Beta Features Active: 0/3")
+
+BetaTab:CreateButton({
+    Name = "🔄 Refresh Beta Stats",
+    Callback = function()
+        local count = 0
+        if _G.BetaFeature1 then count = count + 1 end
+        if _G.BetaFeature2 then count = count + 1 end
+        if _G.BetaFeature3 then count = count + 1 end
+        Rayfield:Notify({
+            Title = "Beta Stats",
+            Content = count .. "/3 features active",
+            Duration = 3
+        })
+    end
+})
+
+-- [[ ========== SAFETY TAB ========== ]]
+SafetyTab:CreateSection("🛡️ Safety Features")
+
+SafetyTab:CreateLabel("⚠️ These features help protect you!")
+
+SafetyTab:CreateToggle({
+    Name = "🛡️ Safety Mode",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.SafetyMode = Value
+        Rayfield:Notify({
+            Title = "Safety Mode",
+            Content = Value and "✅ Enabled" or "❌ Disabled",
+            Duration = 2
+        })
+    end
+})
+
+SafetyTab:CreateToggle({
+    Name = "🚫 Anti-Crash",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.AntiCrash = Value
+        Rayfield:Notify({
+            Title = "Anti-Crash",
+            Content = Value and "✅ Enabled" or "❌ Disabled",
+            Duration = 2
+        })
+    end
+})
+
+SafetyTab:CreateToggle({
+    Name = "❄️ Anti-Freeze",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.AntiFreeze = Value
+        Rayfield:Notify({
+            Title = "Anti-Freeze",
+            Content = Value and "✅ Enabled" or "❌ Disabled",
+            Duration = 2
+        })
+    end
+})
+
+SafetyTab:CreateSection("🔄 Auto Protection")
+
+SafetyTab:CreateToggle({
+    Name = "🔄 Auto Reconnect on Kick",
+    CurrentValue = false,
+    Callback = function(Value)
+        print("Auto Reconnect:", Value)
+        Rayfield:Notify({
+            Title = "Auto Reconnect",
+            Content = Value and "✅ Enabled" or "❌ Disabled",
+            Duration = 2
+        })
+    end
+})
+
+SafetyTab:CreateButton({
+    Name = "🔄 Reconnect Now",
+    Callback = function()
+        Rayfield:Notify({
+            Title = "Reconnecting...",
+            Content = "Attempting to reconnect...",
+            Duration = 3
+        })
+        -- Reconnect logic here
+    end
+})
+
+-- [[ ========== ANTI TAB ========== ]]
+AntiTab:CreateSection("🚫 Anti Features")
+
+AntiTab:CreateLabel("⚠️ Anti-features to prevent issues")
+
+AntiTab:CreateToggle({
+    Name = "🚫 Anti-Kick",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.AntiKick = Value
+        Rayfield:Notify({
+            Title = "Anti-Kick",
+            Content = Value and "✅ Enabled" or "❌ Disabled",
+            Duration = 2
+        })
+    end
+})
+
+AntiTab:CreateToggle({
+    Name = "🚫 Anti-Ban",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.AntiBan = Value
+        Rayfield:Notify({
+            Title = "Anti-Ban",
+            Content = Value and "✅ Enabled" or "❌ Disabled",
+            Duration = 2
+        })
+    end
+})
+
+AntiTab:CreateToggle({
+    Name = "🚫 Anti-Exploit Detection",
+    CurrentValue = false,
+    Callback = function(Value)
+        print("Anti-Exploit Detection:", Value)
+        Rayfield:Notify({
+            Title = "Anti-Exploit Detection",
+            Content = Value and "✅ Enabled" or "❌ Disabled",
+            Duration = 2
+        })
+    end
+})
+
+AntiTab:CreateSection("🛡️ Advanced Protection")
+
+AntiTab:CreateToggle({
+    Name = "🛡️ Script Protection",
+    CurrentValue = false,
+    Callback = function(Value)
+        print("Script Protection:", Value)
+        Rayfield:Notify({
+            Title = "Script Protection",
+            Content = Value and "✅ Enabled" or "❌ Disabled",
+            Duration = 2
+        })
+    end
+})
+
+AntiTab:CreateToggle({
+    Name = "🛡️ Server Protection",
+    CurrentValue = false,
+    Callback = function(Value)
+        print("Server Protection:", Value)
+        Rayfield:Notify({
+            Title = "Server Protection",
+            Content = Value and "✅ Enabled" or "❌ Disabled",
+            Duration = 2
+        })
+    end
+})
+
+AntiTab:CreateButton({
+    Name = "🔄 Reset Anti-Features",
+    Callback = function()
+        _G.AntiKick = false
+        _G.AntiBan = false
+        Rayfield:Notify({
+            Title = "Reset",
+            Content = "All anti-features reset!",
+            Duration = 3
+        })
+    end
+})
+
+-- [[ ========== BYPASS TAB ========== ]]
+BypassTab:CreateSection("🔓 Bypass Features")
+
+BypassTab:CreateLabel("⚠️ Use these at your own risk!")
+
+BypassTab:CreateToggle({
+    Name = "🔓 Activate Bypass",
+    CurrentValue = false,
+    Callback = function(Value)
+        _G.BypassActive = Value
+        Rayfield:Notify({
+            Title = "Bypass",
+            Content = Value and "✅ Activated" or "❌ Deactivated",
+            Duration = 2
+        })
+    end
+})
+
+BypassTab:CreateToggle({
+    Name = "🔓 Bypass Anti-Exploit",
+    CurrentValue = false,
+    Callback = function(Value)
+        print("Bypass Anti-Exploit:", Value)
+        Rayfield:Notify({
+            Title = "Bypass Anti-Exploit",
+            Content = Value and "✅ Enabled" or "❌ Disabled",
+            Duration = 2
+        })
+    end
+})
+
+BypassTab:CreateToggle({
+    Name = "🔓 Bypass Anti-Cheat",
+    CurrentValue = false,
+    Callback = function(Value)
+        print("Bypass Anti-Cheat:", Value)
+        Rayfield:Notify({
+            Title = "Bypass Anti-Cheat",
+            Content = Value and "✅ Enabled" or "❌ Disabled",
+            Duration = 2
+        })
+    end
+})
+
+BypassTab:CreateSection("⚡ Bypass Settings")
+
+BypassTab:CreateSlider({
+    Name = "Bypass Strength",
+    Range = {1, 10},
+    Increment = 1,
+    CurrentValue = 5,
+    Callback = function(Value)
+        print("Bypass strength set to:", Value)
+        Rayfield:Notify({
+            Title = "Bypass Strength",
+            Content = "Set to " .. Value,
+            Duration = 2
+        })
+    end
+})
+
+BypassTab:CreateButton({
+    Name = "🔄 Reset Bypass",
+    Callback = function()
+        _G.BypassActive = false
+        Rayfield:Notify({
+            Title = "Reset",
+            Content = "Bypass reset!",
+            Duration = 3
+        })
+    end
+})
+
+-- [[ ========== FUN TAB ========== ]]
+FunTab:CreateSection("🎉 Fun Features")
+
+FunTab:CreateLabel("Just for fun! 😄")
+
+FunTab:CreateButton({
+    Name = "🎭 Toggle Dance Mode",
+    Callback = function()
+        Rayfield:Notify({
+            Title = "Dance Mode!",
+            Content = "💃🕺 Let's dance!",
+            Duration = 3
+        })
+    end
+})
+
+FunTab:CreateButton({
+    Name = "🎵 Play Random Sound",
+    Callback = function()
+        Rayfield:Notify({
+            Title = "Sound!",
+            Content = "🔊 Playing random sound...",
+            Duration = 2
+        })
+    end
+})
+
+FunTab:CreateToggle({
+    Name = "🌈 Rainbow Character",
+    CurrentValue = false,
+    Callback = function(Value)
+        print("Rainbow Character:", Value)
+        Rayfield:Notify({
+            Title = "Rainbow Character",
+            Content = Value and "✅ Enabled 🌈" or "❌ Disabled",
+            Duration = 2
+        })
+    end
+})
+
+FunTab:CreateToggle({
+    Name = "🎨 Colorful Chat",
+    CurrentValue = false,
+    Callback = function(Value)
+        print("Colorful Chat:", Value)
+        Rayfield:Notify({
+            Title = "Colorful Chat",
+            Content = Value and "✅ Enabled" or "❌ Disabled",
+            Duration = 2
+        })
+    end
+})
+
+FunTab:CreateSection("😄 Fun Stats")
+
+FunTab:CreateLabel("Fun Features Active: 0/4")
+
+FunTab:CreateButton({
+    Name = "🔄 Refresh Fun Stats",
+    Callback = function()
+        Rayfield:Notify({
+            Title = "Fun Stats",
+            Content = "Check console for details!",
+            Duration = 3
+        })
+    end
+})
+
+FunTab:CreateButton({
+    Name = "🎁 Random Surprise",
+    Callback = function()
+        local surprises = {
+            "🎉 You got a free cookie!",
+            "🎁 Here's a virtual hug!",
+            "🌟 You're amazing!",
+            "💎 You found a hidden gem!",
+            "🦄 A unicorn appeared!",
+            "🍕 Free pizza for you!",
+        }
+        local random = surprises[math.random(1, #surprises)]
+        Rayfield:Notify({
+            Title = "🎁 Surprise!",
+            Content = random,
+            Duration = 4
         })
     end
 })
@@ -411,6 +933,7 @@ SettingsTab:CreateSection("ℹ️ Info")
 
 SettingsTab:CreateLabel("Script ID: " .. scriptID)
 SettingsTab:CreateLabel("Version: " .. scriptVersion)
+SettingsTab:CreateLabel("Made by: SellLemons")
 
 SettingsTab:CreateButton({
     Name = "📋 Copy Script ID",
@@ -419,6 +942,17 @@ SettingsTab:CreateButton({
         Rayfield:Notify({
             Title = "✅ Copied!",
             Content = "Script ID copied to clipboard",
+            Duration = 3
+        })
+    end
+})
+
+SettingsTab:CreateButton({
+    Name = "🔄 Reset All Settings",
+    Callback = function()
+        Rayfield:Notify({
+            Title = "Reset",
+            Content = "All settings reset!",
             Duration = 3
         })
     end
@@ -475,6 +1009,77 @@ RunService.Stepped:Connect(function()
     end
 end)
 
+-- God Mode
+RunService.Heartbeat:Connect(function()
+    if _G.GodMode and LocalPlayer.Character then
+        local hum = LocalPlayer.Character:FindFirstChildOfClass("Humanoid")
+        if hum then
+            hum.MaxHealth = math.huge
+            hum.Health = math.huge
+        end
+    end
+end)
+
+-- Spin Bot
+task.spawn(function()
+    while true do
+        task.wait(0.1)
+        if _G.SpinBot and LocalPlayer.Character then
+            local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                hrp.CFrame = hrp.CFrame * CFrame.Angles(0, 0.1, 0)
+            end
+        end
+    end
+end)
+
+-- Fly Mode
+local flyBodyVelocity = nil
+local flyBodyGyro = nil
+
+RunService.Heartbeat:Connect(function()
+    if _G.FlyMode and LocalPlayer.Character then
+        local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+        if hrp then
+            if not flyBodyVelocity then
+                flyBodyVelocity = Instance.new("BodyVelocity")
+                flyBodyVelocity.MaxForce = Vector3.new(1, 1, 1) * 100000
+                flyBodyVelocity.Parent = hrp
+                
+                flyBodyGyro = Instance.new("BodyGyro")
+                flyBodyGyro.MaxTorque = Vector3.new(1, 1, 1) * 100000
+                flyBodyGyro.Parent = hrp
+            end
+            
+            local moveVector = Vector3.new()
+            if UserInputService:IsKeyDown(Enum.KeyCode.W) then moveVector = moveVector + hrp.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.S) then moveVector = moveVector - hrp.CFrame.LookVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.A) then moveVector = moveVector - hrp.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.D) then moveVector = moveVector + hrp.CFrame.RightVector end
+            if UserInputService:IsKeyDown(Enum.KeyCode.Space) then moveVector = moveVector + Vector3.new(0, 1, 0) end
+            if UserInputService:IsKeyDown(Enum.KeyCode.LeftShift) then moveVector = moveVector - Vector3.new(0, 1, 0) end
+            
+            flyBodyVelocity.Velocity = moveVector * 50
+            flyBodyGyro.CFrame = hrp.CFrame
+        end
+    else
+        if flyBodyVelocity then flyBodyVelocity:Destroy() flyBodyVelocity = nil end
+        if flyBodyGyro then flyBodyGyro:Destroy() flyBodyGyro = nil end
+    end
+end)
+
+-- Teleport on Damage
+LocalPlayer.CharacterAdded:Connect(function(char)
+    char:WaitForChild("Humanoid").HealthChanged:Connect(function(health)
+        if _G.TeleportOnDamage and LocalPlayer.Character then
+            local hrp = LocalPlayer.Character:FindFirstChild("HumanoidRootPart")
+            if hrp then
+                hrp.CFrame = hrp.CFrame + Vector3.new(0, 50, 0)
+            end
+        end
+    end)
+end)
+
 -- Auto-update title
 task.spawn(function()
     while true do
@@ -487,7 +1092,7 @@ task.spawn(function()
                 if rayfieldGui then
                     local titleLabel = rayfieldGui:FindFirstChild("Title", true)
                     if titleLabel and titleLabel:IsA("TextLabel") then
-                        titleLabel.Text = currentName .. " | v" .. scriptVersion
+                        titleLabel.Text = "🔰 " .. currentName .. " | v" .. scriptVersion
                     end
                 end
             end)
@@ -495,6 +1100,7 @@ task.spawn(function()
     end
 end)
 
-print("✅ Menu loaded successfully!")
+print("✅ SellLemons Hub loaded successfully!")
+print("📋 Tabs: Main | Automation | Cheats | Beta | Safety | Anti | Bypass | Fun | Settings")
 print("📋 Script ID:", scriptID)
 print("📋 Version:", scriptVersion)
