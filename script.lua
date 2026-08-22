@@ -70,7 +70,6 @@ local ReplicatedStorage = game:GetService("ReplicatedStorage")
 local MarketplaceService = game:GetService("MarketplaceService")
 local CoreGui = game:GetService("CoreGui")
 local TeleportService = game:GetService("TeleportService")
-local VirtualUser = game:GetService("VirtualUser")
 local TweenService = game:GetService("TweenService")
 
 -- [[ ========== GLOBALS ========== ]]
@@ -159,7 +158,7 @@ local Window = Rayfield:CreateWindow({
 
 print("✅ Window created!")
 
--- [[ ========== CREATE ALL TABS ========== ]]
+-- [[ ========== CREATE ALL 9 TABS ========== ]]
 local MainTab = Window:CreateTab("Main", "home")
 local AutomationTab = Window:CreateTab("Automation", "play")
 local CheatsTab = Window:CreateTab("Cheats", "zap")
@@ -647,7 +646,6 @@ SafetyTab:CreateButton({
             Content = "Attempting to reconnect...",
             Duration = 3
         })
-        -- Reconnect logic here
     end
 })
 
